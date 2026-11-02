@@ -98,6 +98,9 @@ footer .big a{color:var(--ink);overflow-wrap:anywhere}
   footer .big{font-size:28px}
   .trace{margin-top:36px}
 }
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;font-size:15px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:10;max-width:calc(100% - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}}
 </style>
 </head>
 <body>
@@ -108,7 +111,7 @@ footer .big a{color:var(--ink);overflow-wrap:anywhere}
   <p class="lede">I build machine-learning systems and the mobile and web apps that put them in people&rsquo;s hands.</p>
   <p class="where">M.Sc. Computer Science candidate, Lebanese International University. Akkar, Lebanon.</p>
   <ul class="links">
-    <li><a class="primary" href="mailto:osman.okr0092@gmail.com">Email me</a></li>
+    <li><a class="primary" href="mailto:osman.okr0092@gmail.com" data-copy>Email me</a></li>
     <li><a href="https://github.com/osmanokr0092-png">GitHub</a></li>
     <li><a href="https://www.linkedin.com/in/ossman7">LinkedIn</a></li>
   </ul>
@@ -192,7 +195,7 @@ footer .big a{color:var(--ink);overflow-wrap:anywhere}
 </section>
 
 <footer id="contact">
-  <p class="big">Let&rsquo;s talk about your project or team.<br><a href="mailto:osman.okr0092@gmail.com">osman.okr0092@gmail.com</a></p>
+  <p class="big">Let&rsquo;s talk about your project or team.<br><a href="mailto:osman.okr0092@gmail.com" data-copy>osman.okr0092@gmail.com</a></p>
   <ul class="links">
     <li><a href="https://github.com/osmanokr0092-png">GitHub</a></li>
     <li><a href="https://www.linkedin.com/in/ossman7">LinkedIn</a></li>
@@ -201,5 +204,20 @@ footer .big a{color:var(--ink);overflow-wrap:anywhere}
 </footer>
 
 </div>
+<div class="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+  var email='osman.okr0092@gmail.com', toast=document.querySelector('.toast'), t;
+  function show(msg){toast.textContent=msg;toast.classList.add('on');clearTimeout(t);t=setTimeout(function(){toast.classList.remove('on')},3500);}
+  function fallback(){var a=document.createElement('textarea');a.value=email;a.setAttribute('readonly','');a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}document.body.removeChild(a);return ok;}
+  document.querySelectorAll('[data-copy]').forEach(function(link){
+    link.addEventListener('click',function(){
+      var done=function(){show('Email address copied: '+email)}, fail=function(){show('Write to '+email)};
+      if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(email).then(done,function(){fallback()?done():fail()});}
+      else{fallback()?done():fail();}
+    });
+  });
+})();
+</script>
 </body>
 </html>
