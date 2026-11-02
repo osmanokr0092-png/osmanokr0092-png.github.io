@@ -99,7 +99,10 @@ footer .big a{color:var(--ink);overflow-wrap:anywhere}
   .trace{margin-top:36px}
 }
 .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;font-size:15px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:10;max-width:calc(100% - 32px);text-align:center}
-.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 14px;border-radius:18px}
+.toast a{color:var(--bg);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.toast button{background:none;border:0;color:var(--bg);font:inherit;font-size:20px;line-height:1;cursor:pointer;padding:0 2px;opacity:.8}
 @media (prefers-reduced-motion: reduce){.toast{transition:none}}
 </style>
 </head>
@@ -208,13 +211,29 @@ footer .big a{color:var(--ink);overflow-wrap:anywhere}
 <script>
 (function(){
   var email='osman.okr0092@gmail.com', toast=document.querySelector('.toast'), t;
-  function show(msg){toast.textContent=msg;toast.classList.add('on');clearTimeout(t);t=setTimeout(function(){toast.classList.remove('on')},3500);}
-  function fallback(){var a=document.createElement('textarea');a.value=email;a.setAttribute('readonly','');a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}document.body.removeChild(a);return ok;}
+  var gmail='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(email);
+  function copyText(){
+    var a=document.createElement('textarea');a.value=email;a.setAttribute('readonly','');a.style.position='fixed';a.style.opacity='0';
+    document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}document.body.removeChild(a);
+    if(ok) return Promise.resolve();
+    if(navigator.clipboard&&window.isSecureContext) return navigator.clipboard.writeText(email);
+    return Promise.reject();
+  }
+  function show(copied){
+    toast.innerHTML='';
+    var msg=document.createElement('span');
+    msg.textContent=copied?'Email address copied: '+email:'Email: '+email;
+    var g=document.createElement('a');g.href=gmail;g.target='_blank';g.rel='noopener';g.textContent='Open Gmail';
+    var m=document.createElement('a');m.href='mailto:'+email;m.textContent='Use mail app';
+    var x=document.createElement('button');x.type='button';x.setAttribute('aria-label','Close');x.textContent='\u00d7';
+    x.onclick=function(){toast.classList.remove('on')};
+    toast.append(msg,g,m,x);toast.classList.add('on');
+    clearTimeout(t);t=setTimeout(function(){toast.classList.remove('on')},9000);
+  }
   document.querySelectorAll('[data-copy]').forEach(function(link){
-    link.addEventListener('click',function(){
-      var done=function(){show('Email address copied: '+email)}, fail=function(){show('Write to '+email)};
-      if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(email).then(done,function(){fallback()?done():fail()});}
-      else{fallback()?done():fail();}
+    link.addEventListener('click',function(e){
+      e.preventDefault();
+      copyText().then(function(){show(true)},function(){show(false)});
     });
   });
 })();
