@@ -222,7 +222,7 @@ footer .big a{color:var(--ink);overflow-wrap:anywhere}
   function show(copied){
     toast.innerHTML='';
     var msg=document.createElement('span');
-    msg.textContent=copied?'Email address copied: '+email:'Email: '+email;
+    msg.textContent=copied?'Gmail opened in a new tab. Address copied: '+email:'Gmail opened in a new tab. Email: '+email;
     var g=document.createElement('a');g.href=gmail;g.target='_blank';g.rel='noopener';g.textContent='Open Gmail';
     var m=document.createElement('a');m.href='mailto:'+email;m.textContent='Use mail app';
     var x=document.createElement('button');x.type='button';x.setAttribute('aria-label','Close');x.textContent='\u00d7';
@@ -233,6 +233,7 @@ footer .big a{color:var(--ink);overflow-wrap:anywhere}
   document.querySelectorAll('[data-copy]').forEach(function(link){
     link.addEventListener('click',function(e){
       e.preventDefault();
+      window.open(gmail,'_blank','noopener');
       copyText().then(function(){show(true)},function(){show(false)});
     });
   });
